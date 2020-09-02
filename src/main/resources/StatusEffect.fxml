@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="458.0" prefWidth="561.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label layoutX="14.0" layoutY="14.0" text="Select the effect wanted:" />
+      <ListView fx:id="effectsList" layoutX="14.0" layoutY="40.0" prefHeight="357.0" prefWidth="200.0" />
+      <Label layoutX="234.0" layoutY="14.0" text="Name of the effect:" />
+      <TextField fx:id="effectName" editable="false" layoutX="234.0" layoutY="40.0" prefHeight="23.0" prefWidth="314.0" />
+      <Label layoutX="234.0" layoutY="84.0" text="Initial delay of effect (ms):" />
+      <TextField fx:id="initialDelay" editable="false" layoutX="437.0" layoutY="81.0" prefHeight="23.0" prefWidth="97.0" />
+      <Label layoutX="234.0" layoutY="119.0" text="Max Time of effect (ms):" />
+      <TextField fx:id="maxTime" editable="false" layoutX="437.0" layoutY="116.0" prefHeight="23.0" prefWidth="97.0" />
+      <Label layoutX="234.0" layoutY="154.0" text="How many times max?" />
+      <TextField fx:id="numberOfTimes" editable="false" layoutX="437.0" layoutY="151.0" prefHeight="23.0" prefWidth="97.0" />
+      <Label layoutX="234.0" layoutY="189.0" text="Delay between each effect?" />
+      <TextField fx:id="delayBetween" editable="false" layoutX="437.0" layoutY="186.0" prefHeight="23.0" prefWidth="97.0" />
+      <Label layoutX="234.0" layoutY="249.0" text="Affects health by how much?" />
+      <TextField fx:id="affectHealth" editable="false" layoutX="437.0" layoutY="246.0" prefHeight="23.0" prefWidth="97.0" />
+      <Label layoutX="234.0" layoutY="284.0" text="Affects speed by how much?" />
+      <TextField fx:id="affectSpeed" editable="false" layoutX="437.0" layoutY="281.0" prefHeight="23.0" prefWidth="97.0" />
+      <Label layoutX="234.0" layoutY="344.0" text="Can be countered by which effects?" />
+      <ListView fx:id="counterList" layoutX="233.0" layoutY="366.0" prefHeight="82.0" prefWidth="240.0" />
+      <Button fx:id="bClose" layoutX="14.0" layoutY="413.0" mnemonicParsing="false" text="Close" />
+      <Button fx:id="bSave" layoutX="104.0" layoutY="413.0" mnemonicParsing="false" text="Save" />
+      <Button fx:id="bSaveNew" layoutX="495.0" layoutY="413.0" mnemonicParsing="false" text="✓" />
+      <Button fx:id="bNew" layoutX="499.0" layoutY="370.0" mnemonicParsing="false" text="+" />
+      <CheckBox fx:id="cbPermanent" layoutX="234.0" layoutY="219.0" mnemonicParsing="false" text="Effect is permanent?" />
+      <Button fx:id="bDelete" layoutX="503.0" layoutY="328.0" mnemonicParsing="false" text="-" />
+   </children>
+</AnchorPane>

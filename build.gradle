@@ -1,0 +1,266 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+import org.apache.tools.ant.filters.*
+
+plugins {
+  id 'java'
+  id 'maven'
+  id 'maven-publish'
+  id 'jacoco'
+  // Manage optional dependencies in maven pom.
+  id 'nebula.optional-base' version '4.0.1'
+  id 'com.github.spotbugs' version '4.2.3'
+  id 'org.owasp.dependencycheck' version '5.3.2.1'
+  id "org.openjfx.javafxplugin" version "0.0.9"
+}
+
+ext {
+  gameCoreVersion = project.hasProperty('gameCoreVersion') ? project.getProperty('gameCoreVersion') : '1.0-SNAPSHOT'
+  releaseVersion = project.hasProperty('releaseVersion') ? project.getProperty('releaseVersion') : '1.0-SNAPSHOT'
+  nexusBaseUrl = project.hasProperty('nexusBaseUrl') ? project.getProperty('nexusBaseUrl') : 'https://nexus.adaptris.net/nexus'
+  mavenPublishUrl = project.hasProperty('mavenPublishUrl') ? project.getProperty('mavenPublishUrl') : nexusBaseUrl + '/content/repositories/snapshots'
+  javadocsBaseUrl = nexusBaseUrl + "/content/sites/javadocs/com/adaptris"
+  repoUsername = project.hasProperty('repoUsername') ? project.getProperty('repoUsername') : 'unknown'
+  repoPassword = project.hasProperty('repoPassword') ? project.getProperty('repoPassword') : 'unknown'
+  defaultNexusRepo = project.hasProperty('defaultNexusRepo') ? project.getProperty('defaultNexusRepo') : 'https://repo1.maven.org/maven2/'
+  offlineJavadocPackageDir = new File(project.buildDir, "offline-javadoc-packages")
+
+  gameJavadocs= project.hasProperty('gameJavadocs') ? project.getProperty('gameJavadocs') : javadocsBaseUrl + "/game-core/" + gameCoreVersion
+  gameCommonJavadocs= project.hasProperty('gameCommonJavadocs') ? project.getProperty('gameCommonJavadocs') : javadocsBaseUrl + "/game-common/" + gameCoreVersion
+  gameLicenseJavadocs= project.hasProperty('gameLicenseJavadocs') ? project.getProperty('gameLicenseJavadocs') : javadocsBaseUrl + "/game-licensing/" + gameCoreVersion
+  componentName='game-core'
+  organizationName = "AMC"
+  organizationUrl = "http://notyetdecided"
+  
+  
+  slf4jVersion = '1.7.30'
+}
+
+ext.hostname = { ->
+  if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+    return System.getenv("COMPUTERNAME")
+  }
+  return System.getenv("HOSTNAME")
+}
+
+ext.unitTestProperties = { ->
+  def file = new File("src/test/resources", "unit-tests.properties.template." + hostname())
+  if (file.exists()) {
+    return file.getName()
+  }
+  return  "unit-tests.properties.template"
+}
+
+ext.buildInfo = { ->
+   new ByteArrayOutputStream().withStream { os ->
+      exec {
+        executable = "git"
+        args = ["rev-parse", "--abbrev-ref", "HEAD"]
+        standardOutput = os
+      }
+      def branchName = os.toString().replaceAll("\r", "").replaceAll("\n", "").trim();
+      return gitBranchNameOrTimestamp(branchName);
+    }
+}
+
+sourceCompatibility = 1.11
+group   = 'com.adaptris'
+version = releaseVersion
+def versionDir = "$buildDir/version"
+
+repositories {
+  mavenCentral()
+}
+
+javafx {
+    modules = [ 'javafx.controls', 'javafx.fxml' ]
+}
+
+configurations {
+  javadoc {}
+  offlineJavadocPackages {}
+  all*.exclude group: 'c3p0'
+  all*.exclude group: 'commons-logging'
+  all*.exclude group: 'javamail'
+  all*.exclude group: 'javax.mail', module: 'mail'
+  all*.exclude group: 'org.glassfish.hk2.external'
+  all*.exclude group: 'xalan', module: 'xalan'
+  all*.exclude group: 'net.sf.saxon', module: 'saxon'
+  all*.exclude group: 'org.codehaus.woodstox'
+  all*.exclude group: 'org.eclipse.jetty.orbit', module: 'javax.mail.glassfish'
+  // game-3197 exclude old javax.mail
+  all*.exclude group: 'com.sun.mail', module: 'javax.mail'
+  all*.exclude group: 'javax.validation', module: 'validation-api'
+  all*.exclude group: 'javax.activation', module: 'activation'
+  all*.exclude group: 'javax.activation', module: 'javax.activation-api'
+}
+
+configurations.all {
+  resolutionStrategy.cacheChangingModulesFor 0, "seconds"
+}
+
+dependencies {
+
+  compile ("org.slf4j:slf4j-api:$slf4jVersion")
+
+  testCompile ('junit:junit:4.13')
+  testCompile "org.slf4j:slf4j-simple:$slf4jVersion"
+  testCompile ("org.mockito:mockito-all:1.9.5")
+}
+
+
+jar {
+  manifest {
+    attributes("Built-By": System.getProperty('user.name'),
+               "Build-Jdk": System.getProperty('java.version'),
+               "Implementation-Title": componentName,
+               "Implementation-Version": project.version,
+               "Implementation-Vendor-Id": project.group,
+               "Implementation-Vendor": organizationName)
+  }
+}
+
+
+sourceSets {
+  main {
+    output.dir(versionDir, builtBy: 'generateVersion')
+  }
+}
+
+task copyUnitTestProperties(type: Copy) {
+  delete file('src/test/resources/unit-tests.properties')
+  from file("src/test/resources/" + unitTestProperties())
+  into ('src/test/resources/')
+  rename { String fileName ->
+    fileName.replace(unitTestProperties(), 'unit-tests.properties')
+  }
+  filter(ReplaceTokens, tokens: [JAVA_HOME: System.getProperty("java.home").replaceAll("\\\\", "/")])
+  filter(ReplaceTokens, tokens: [BASE_DIR: project.rootDir.getCanonicalPath().replaceAll("\\\\", "/")])
+  filter(ReplaceTokens, tokens: [BUILD_DIR: project.buildDir.getCanonicalPath().replaceAll("\\\\", "/")])
+}
+
+task deleteUnitTestProperties(type: Delete) {
+    delete file('src/test/resources/unit-tests.properties')
+}
+
+// Generate the META-INF/adaptris-version file
+task generateVersion {
+  doLast {
+    def versionFile = new File(new File(versionDir, 'META-INF'), 'adaptris-version')
+    versionFile.getParentFile().mkdirs()
+    
+  }
+}
+task offlinePackageList(type: Copy) {
+  description 'Build an offline package-list for javadocs'
+  group 'Documentation'
+
+  project.configurations.offlineJavadocPackages.collect { dependency ->
+    from(zipTree(dependency)) {
+      into dependency.name
+    }
+  }
+  include "package-list"
+  into offlineJavadocPackageDir
+}
+javadoc {
+  configure(options) {
+    options.linksOffline(gameJavadocs, offlineJavadocPackageDir.getCanonicalPath() + "/game-core-$gameCoreVersion-javadoc.jar")
+    options.linksOffline(gameCommonJavadocs, offlineJavadocPackageDir.getCanonicalPath() + "/game-common-$gameCoreVersion-javadoc.jar")
+    options.linksOffline(gameLicenseJavadocs, offlineJavadocPackageDir.getCanonicalPath() + "/game-licensing-$gameCoreVersion-javadoc.jar")
+
+    taglets = ["com.adaptris.taglet.ConfigTaglet", "com.adaptris.taglet.LicenseTaglet"]
+    options.addStringOption "tagletpath", configurations.javadoc.asPath
+    title= componentName
+  }
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        html.enabled true
+    }
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+  classifier = 'javadoc'
+  from javadoc.destinationDir
+}
+
+task examplesJar(type: Jar, dependsOn: test) {
+  classifier = 'examples'
+  from new File(buildDir, '/examples')
+}
+
+
+artifacts {
+  archives javadocJar
+  archives examplesJar
+}
+
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      from components.java
+
+      artifact javadocJar { classifier "javadoc" }
+      artifact examplesJar { classifier "examples" }
+
+      pom.withXml {
+        asNode().appendNode("name", componentName)
+        asNode().appendNode("description", "Using Solace as a JMS Provider")
+        def properties = asNode().appendNode("properties")
+        properties.appendNode("target", "3.8.0+")
+        properties.appendNode("tags", "solace,jms")
+        properties.appendNode("license", "true")
+      }
+    }
+  }
+  repositories {
+    maven {
+      credentials {
+        username repoUsername
+        password repoPassword
+      }
+      url mavenPublishUrl
+    }
+  }
+}
+
+spotbugsMain {
+  effort = "max"
+  reportLevel = "high"
+  // showProgress = "true"
+  effort = "max"
+  // Ignore failures?
+  // ignoreFailures = false
+  reports {
+    xml {
+      enabled = false
+    }
+    html {
+      enabled = true
+    }
+  }
+  // includeFilter = new File("$rootDir/gradle/spotbugs-filter.xml")
+  // excludeFilter = new File("$rootDir/gradle/spotbugs-exclude.xml")
+}
+
+dependencyCheck  {
+  suppressionFiles= [ "https://raw.githubusercontent.com/adaptris/game/develop/gradle/owasp-exclude.xml" ]
+  skipConfigurations = [ "antSql", "spotbugs", "offlineJavadocPackages", "javadoc", "jacocoAnt", "jacocoAgent", "spotbugsPlugins", "spotbugsSlf4j" ]
+  formats = [ "HTML", "JUNIT" ]
+  junitFailOnCVSS = 7.0
+  failBuildOnCVSS = 7.0
+  analyzers {
+    assemblyEnabled=false
+  }
+}
+
+
+// disable spotbugsTests which checks our test code..
+spotbugsTest.enabled = false
+
+check.dependsOn jacocoTestReport
+processTestResources.dependsOn copyUnitTestProperties
+clean.dependsOn deleteUnitTestProperties
+javadoc.dependsOn offlinePackageList
