@@ -1,91 +1,97 @@
 package amc;
 
-import java.awt.image.BufferedImage;
+import java.io.Serializable;
+import java.util.List;
 
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 
-import amc.objects.Player;
+public class Level implements Serializable {
 
-public class Level {
-
-  private static final int SPACER = GamePreferences.getInstance().getIntPreference(GamePreferencesEnum.MAP_SPACER_DO_NOT_CHANGE);
+  private static final long serialVersionUID = 6645756318491192970L;
   
-  private String mapResource;
+  private String name;
   
-  private String wavResource;
+  private int width, height;
   
-  private BufferedImage mapImage;
+  private String ambientSoundResource;
   
-  public Level(String mapResource, String wavResource) {
-    this.setMapResource(mapResource);
-    this.setWavResource(wavResource);
-  }
-
-  public String getMapResource() {
-    return mapResource;
-  }
-
-  public void setMapResource(String mapResource) {
-    this.mapResource = mapResource;
+  private String backgroundImageResource;
+  
+  private boolean repeatBackgroundImage;
+  
+  private List<GameObject> gameObjects;
+  
+  public Level() {
   }
   
   public void loadLevel(ObjectHandler objectHandler) {
-    this.setMapImage(BufferedImageLoader.loadImage(getMapResource()));
     
-    int width = getMapImage().getWidth();
-    int height = getMapImage().getHeight();
-    
-    for(int x = 0; x < width; x ++) {
-      for(int y = 0; y < height; y ++) {
-        int pixel = getMapImage().getRGB(x, y);
-        int red = (pixel >> 16) & 0xff;
-        int green = (pixel >> 8) & 0xff;
-        int blue = (pixel) & 0xff;
-        
-        String code = Integer.toString(red) + Integer.toString(green) + Integer.toString(blue); 
-        
-        if(!code.equals("000")) { // skip the black squares
-          AvailableGameObjects gameObject = AvailableGameObjects.findObject(code);
-          if(gameObject != null) {
-            GameObject newObject = gameObject.createObjectInstance(0, 0, objectHandler);
-            newObject.setX(x * SPACER);
-            newObject.setY(y * SPACER);
-            
-            if(newObject instanceof Player)
-              objectHandler.setPlayer(newObject);
-            else
-              objectHandler.addGameObject(newObject);
-          }
-        }
-      }
-    }
-    this.startWav();
   }
 
-  private void startWav() {
+  public void startAmbientBackground() {
     try {
       Clip clip = AudioSystem.getClip();
-      clip.open(AudioSystem.getAudioInputStream(this.getClass().getClassLoader().getResourceAsStream(getWavResource())));
+      clip.open(AudioSystem.getAudioInputStream(this.getClass().getClassLoader().getResourceAsStream(getAmbientSoundResource())));
       clip.start();
     } catch (Exception exc) {
       exc.printStackTrace(System.out);
     }
   }
 
-  public BufferedImage getMapImage() {
-    return mapImage;
+  public int getWidth() {
+    return width;
   }
 
-  public void setMapImage(BufferedImage mapImage) {
-    this.mapImage = mapImage;
+  public int getHeight() {
+    return height;
   }
 
-  public String getWavResource() {
-    return wavResource;
+  public void setWidth(int width) {
+    this.width = width;
   }
 
-  public void setWavResource(String wavResource) {
-    this.wavResource = wavResource;
+  public void setHeight(int height) {
+    this.height = height;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getAmbientSoundResource() {
+    return ambientSoundResource;
+  }
+
+  public void setAmbientSoundResource(String ambientSoundResource) {
+    this.ambientSoundResource = ambientSoundResource;
+  }
+
+  public String getBackgroundImageResource() {
+    return backgroundImageResource;
+  }
+
+  public boolean isRepeatBackgroundImage() {
+    return repeatBackgroundImage;
+  }
+
+  public void setBackgroundImageResource(String backgroundImageResource) {
+    this.backgroundImageResource = backgroundImageResource;
+  }
+
+  public void setRepeatBackgroundImage(boolean repeatBackgroundImage) {
+    this.repeatBackgroundImage = repeatBackgroundImage;
+  }
+
+  public List<GameObject> getGameObjects() {
+    return gameObjects;
+  }
+
+  public void setGameObjects(List<GameObject> gameObjects) {
+    this.gameObjects = gameObjects;
   }
 }

@@ -27,11 +27,7 @@ public class GameLoop implements Runnable {
   private static final String HUD_SPRITE = GamePreferences.getInstance().getStringPreference(GamePreferencesEnum.HUD_SPRITE);
   private static final String HUD_EMPTY_SLOT_SPRITE = GamePreferences.getInstance().getStringPreference(GamePreferencesEnum.HUD_EMPTY_SLOT_SPRITE);
   private static final String HUD_FILLED_SLOT_SPRITE = GamePreferences.getInstance().getStringPreference(GamePreferencesEnum.HUD_FILLED_SLOT_SPRITE);
-  
-  private static final String FLOOR_SPRITE = GamePreferences.getInstance().getStringPreference(GamePreferencesEnum.FLOOR_SPRITE);
-  
-  private Image wallSprite = BufferedImageLoader.loadImage(FLOOR_SPRITE);
-  
+      
   private Image hudSprite = BufferedImageLoader.loadImage(HUD_SPRITE);
   private Image hudEmptySlotSprite = BufferedImageLoader.loadImage(HUD_EMPTY_SLOT_SPRITE);
   private Image hudFilledSlotSprite = BufferedImageLoader.loadImage(HUD_FILLED_SLOT_SPRITE);
@@ -47,12 +43,11 @@ public class GameLoop implements Runnable {
     GameState gameState = GameState.getInstance();
     gameState.setRunning(true);
     
-    Level level = new Level("Level1.png", "Level1.wav");
-    gameState.setCurrentLevel(level);
-    level.loadLevel(getObjectHandler());
+    // TODO: Need to set the level.
+    gameState.getCurrentLevel().loadLevel(getObjectHandler());
     
     this.setCamera(new Camera(0, 0));
-    this.getCamera().setCurrentLevel(level);
+    this.getCamera().setCurrentLevel(gameState.getCurrentLevel());
     
     getCanvas().addKeyListener(new KeyInput(getObjectHandler()));
     getCanvas().addMouseListener(new MouseInput(getObjectHandler(), getCamera()));
@@ -112,13 +107,8 @@ public class GameLoop implements Runnable {
     
     graphics2d.translate(-camera.getX(), -camera.getY());
     
-    int x = GameState.getInstance().getCurrentLevel().getMapImage().getWidth();
-    int y = GameState.getInstance().getCurrentLevel().getMapImage().getHeight();
-    for(int counterX = 0 ; counterX < x; counterX ++) {
-      for(int counterY = 0 ; counterY < y; counterY ++) {
-        graphics.drawImage(wallSprite, counterX * 32, counterY *32, null);
-      }
-    }
+    // Probably needs a repeat thing.
+    graphics.drawImage(BufferedImageLoader.loadImage(GameState.getInstance().getCurrentLevel().getBackgroundImageResource()), 0, 0, null);
     
     this.getObjectHandler().render(graphics);
     

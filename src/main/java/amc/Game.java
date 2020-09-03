@@ -2,7 +2,7 @@ package amc;
 
 public class Game {
 
-  private void start() {
+  public void start() {
     GamePreferences.getInstance().loadPreferences();
     
     int height = GamePreferences.getInstance().getIntPreference(GamePreferencesEnum.WINDOW_HEIGHT);
@@ -13,6 +13,11 @@ public class Game {
     
     Thread gameThread = new Thread(new GameLoop(window.getCanvas()), "GameThread");
     gameThread.start();
+  }
+  
+  public void start(Level selectedLevel) {
+    GameState.getInstance().setCurrentLevel(selectedLevel);
+    this.start();
   }
   
   public static void main(String[] arguments) {

@@ -2,8 +2,8 @@ package amc.levelcreator;
 
 import java.io.File;
 
+import amc.GameObject;
 import amc.actions.StatusEffectCollisionAction;
-import amc.objects.GameObjectWithStatusEffects;
 import amc.statuseffects.StatusEffect;
 import amc.statuseffects.StatusEffectController;
 import javafx.fxml.FXML;
@@ -128,7 +128,7 @@ public class NewItemController {
     bSave.setOnMouseClicked(event -> {
       newItem.setName(name.getText());
       
-      GameObjectWithStatusEffects gameObject = newItem.getGameObject();
+      GameObject gameObject = newItem.getGameObject();
       gameObject.setPassable(cbPassable.isSelected());
       
       closeWindow();

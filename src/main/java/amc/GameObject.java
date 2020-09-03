@@ -61,6 +61,10 @@ public abstract class GameObject implements Serializable, Cloneable {
     this.setIdleImage(BufferedImageLoader.loadImage(getIdleImageResource()));
     return idleImage;
   };
+  
+  public Object clone() {
+    return this;
+  }
 
   public void setIdleImage(BufferedImage idleImage) {
     this.idleImage = idleImage;

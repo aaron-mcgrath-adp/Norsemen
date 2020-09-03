@@ -6,8 +6,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import amc.GameObject;
 import amc.GamePreferences;
 import amc.GamePreferencesEnum;
+import amc.Level;
 import amc.util.PropertyFileHandler;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -57,7 +59,7 @@ public class ZoneCreatorController {
   private TextField zoneName, zoneX, zoneY;
   
   @FXML
-  private TextField zoneBackground;
+  private TextField zoneBackground, ambientSoundResource;
   
   @FXML
   private ListView<Item> itemListView;
@@ -75,6 +77,9 @@ public class ZoneCreatorController {
   
   @FXML
   private CheckBox cbRepeatBackground;
+  
+  @FXML
+  private Level editingLevel;
   
   private Map<String, ImageView> onScreenDisplayItemsMap;
   private Map<ImageView, String> onScreenDisplayItemsReverseMap;
@@ -121,11 +126,43 @@ public class ZoneCreatorController {
     bSave.setOnMouseClicked( event -> {
       doSaveZone();
     });
+    
+    loadLevel();
+  }
+
+  private void loadLevel() {
+    if(getEditingLevel() != null) {
+      zoneName.setText(getEditingLevel().getName());
+      zoneX.setText(Integer.toString(getEditingLevel().getWidth()));
+      zoneY.setText(Integer.toString(getEditingLevel().getHeight()));
+      zoneBackground.setText(getEditingLevel().getBackgroundImageResource());
+      cbRepeatBackground.setSelected(getEditingLevel().isRepeatBackgroundImage());
+      ambientSoundResource.setText(getEditingLevel().getAmbientSoundResource());
+      
+      getEditingLevel().getGameObjects().forEach( gameObject -> {
+        int gridX = gameObject.getX() / SPACER;
+        int gridY = gameObject.getY() / SPACER;
+        handleZonePaneEdit(new Item(gameObject), gridX, gridY, gameObject.getX(), gameObject.getY());
+      });
+    }
   }
 
   private void doSaveZone() {
+    if(getEditingLevel() == null)
+      setEditingLevel(new Level());
     if(!zoneName.getText().isEmpty()) {
+      getEditingLevel().setName(zoneName.getText());
+      getEditingLevel().setWidth(Integer.parseInt(zoneX.getText()));
+      getEditingLevel().setHeight(Integer.parseInt(zoneY.getText()));
       
+      List<GameObject> objects = new ArrayList<>();
+      imageViewToItemsMap.forEach( (image, item) -> {
+        objects.add(imageViewToItemsMap.get(image).getGameObject());
+      });
+      getEditingLevel().setGameObjects(objects);
+      
+      String levelResource = ZONES_DIR + getEditingLevel().getName();
+      PropertyFileHandler.saveBinaryFile(levelResource, getEditingLevel());
     } else
       System.out.println("Zone name is not set, cannot save.");
   }
@@ -206,44 +243,37 @@ public class ZoneCreatorController {
   
         int gridX = (int) (mouseX / SPACER);
         int gridY = (int) (mouseY / SPACER);
-        
-        handleZonePaneEdit(gridX, gridY, mouseX, mouseY);
+        if(itemsTab.isSelected()) {
+          Item selectedItem = (Item) itemListView.getSelectionModel().getSelectedItem().clone();
+          if(selectedItem != null) {
+            handleZonePaneEdit(selectedItem, gridX, gridY, mouseX, mouseY);
+          }
+        }
       }
     });
   }
 
-  private void handleZonePaneEdit(int gridX, int gridY, double xCoord, double yCoord) {
+  private void handleZonePaneEdit(Item item, int gridX, int gridY, double xCoord, double yCoord) {
     String key = gridX + ":::" + gridY;
     
     if(onScreenDisplayItemsMap.containsKey(key)) {
       System.out.println("Item already at this location, skipping.");
     } else {
-      if(itemsTab.isSelected()) {
-        Item selectedItem = (Item) itemListView.getSelectionModel().getSelectedItem().clone();
-        if(selectedItem != null) {
-          ImageView imageView = new ImageView(new Image(this.getClass().getClassLoader().getResourceAsStream(selectedItem.getImageResource())));
-          imageView.setOnMouseClicked( event -> {
-            if(event.getButton().equals(MouseButton.SECONDARY)) 
-              handleDeleteItem(imageView);
-            else if(event.getButton().equals(MouseButton.MIDDLE))
-              handleEditItem(imageView);
-          });
-          
-          selectedItem.getGameObject().setX((int) xCoord);
-          selectedItem.getGameObject().setY((int) yCoord);
-          
-          zonePane.add(imageView, gridX, gridY);
-          onScreenDisplayItemsMap.put(key, imageView);
-          imageViewToItemsMap.put(imageView, selectedItem);
-          onScreenDisplayItemsReverseMap.put(imageView, key);
-        }
-      } else if (monstersTab.isSelected()) {
-        Monster selectedItem = monsterListView.getSelectionModel().getSelectedItem();
-        if(selectedItem != null) {
-          ImageView imageView = new ImageView(new Image(this.getClass().getClassLoader().getResourceAsStream(selectedItem.getImageResource())));
-          zonePane.add(imageView, gridX, gridY);
-        }
-      }
+      ImageView imageView = new ImageView(new Image(this.getClass().getClassLoader().getResourceAsStream(item.getImageResource())));
+      imageView.setOnMouseClicked( event -> {
+        if(event.getButton().equals(MouseButton.SECONDARY)) 
+          handleDeleteItem(imageView);
+        else if(event.getButton().equals(MouseButton.MIDDLE))
+          handleEditItem(imageView);
+      });
+      
+      item.getGameObject().setX((int) xCoord);
+      item.getGameObject().setY((int) yCoord);
+      
+      zonePane.add(imageView, gridX, gridY);
+      onScreenDisplayItemsMap.put(key, imageView);
+      imageViewToItemsMap.put(imageView, item);
+      onScreenDisplayItemsReverseMap.put(imageView, key);
     }
   }
 
@@ -320,6 +350,14 @@ public class ZoneCreatorController {
     for(int x = (zonePane.getColumnConstraints().size() - 1); x > numberXGrids; x --) {
       zonePane.getColumnConstraints().remove(x);
     }
+  }
+
+  public Level getEditingLevel() {
+    return editingLevel;
+  }
+
+  public void setEditingLevel(Level editingLevel) {
+    this.editingLevel = editingLevel;
   }
  
 }

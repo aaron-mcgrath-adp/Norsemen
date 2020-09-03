@@ -45,4 +45,22 @@ public class PropertyFileHandler {
     }
   }
   
+  public static void saveBinaryFile(String propertiesFileName, Object object) {
+    try {
+      File file = new File(propertiesFileName);
+      if(file.exists()) {
+        file.delete();
+        file.createNewFile();
+      }
+
+      FileOutputStream fileOutputStream = new FileOutputStream(propertiesFileName);
+      ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+      objectOutputStream.writeObject(object);
+      objectOutputStream.flush();
+      objectOutputStream.close();
+    } catch (Exception ex) {
+      ex.printStackTrace();
+    }
+  }
+  
 }

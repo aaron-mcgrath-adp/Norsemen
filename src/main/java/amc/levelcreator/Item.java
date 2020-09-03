@@ -2,6 +2,7 @@ package amc.levelcreator;
 
 import java.io.Serializable;
 
+import amc.GameObject;
 import amc.objects.GameObjectWithStatusEffects;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -11,7 +12,7 @@ public class Item extends Label implements Serializable, Cloneable {
   
   private static final long serialVersionUID = -5025711714170164329L;
   
-  private GameObjectWithStatusEffects gameObject;
+  private GameObject gameObject;
     
   private String name;
   
@@ -23,10 +24,16 @@ public class Item extends Label implements Serializable, Cloneable {
     this.setName(name);
     this.setImageResource(imageResource);
   }
+  
+  public Item(GameObject gameObject) {
+    this.setName(gameObject.getName());
+    this.setImageResource(gameObject.getIdleImageResource());
+    this.setGameObject(gameObject);
+  }
 
   public Object clone() {
     Item cloned = new Item(getName(), getImageResource());
-    cloned.setGameObject((GameObjectWithStatusEffects) getGameObject().clone());
+    cloned.setGameObject((GameObject) getGameObject().clone());
     
     return cloned;
   }
@@ -63,11 +70,11 @@ public class Item extends Label implements Serializable, Cloneable {
     return this;
   }
 
-  public GameObjectWithStatusEffects getGameObject() {
+  public GameObject getGameObject() {
     return gameObject;
   }
 
-  public void setGameObject(GameObjectWithStatusEffects gameObject) {
+  public void setGameObject(GameObject gameObject) {
     this.gameObject = gameObject;
   }
 

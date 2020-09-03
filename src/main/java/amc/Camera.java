@@ -27,12 +27,12 @@ public class Camera {
     } else {
       if(x <= 0) 
         x = 0;
-      if(x >= (getCurrentLevel().getMapImage().getWidth() * MAP_SPACER)) 
-        x = (getCurrentLevel().getMapImage().getWidth() * MAP_SPACER);
+      if(x >= (getCurrentLevel().getWidth() * MAP_SPACER)) 
+        x = (getCurrentLevel().getWidth() * MAP_SPACER);
       if(y <= 0) 
         y = 0;
-      if(y >= (getCurrentLevel().getMapImage().getHeight() * MAP_SPACER)) 
-        x = (getCurrentLevel().getMapImage().getHeight() * MAP_SPACER);
+      if(y >= (getCurrentLevel().getHeight() * MAP_SPACER)) 
+        x = (getCurrentLevel().getHeight() * MAP_SPACER);
     }
   }
 
