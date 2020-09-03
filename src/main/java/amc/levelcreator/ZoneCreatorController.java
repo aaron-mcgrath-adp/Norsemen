@@ -147,7 +147,7 @@ public class ZoneCreatorController {
     }
   }
 
-  private void deleteSelectedItem() {
+  private void deleteSelectedItem() {    
     if(itemListView.getSelectionModel().getSelectedIndex() >= 0)
       itemListView.getItems().remove(itemListView.getSelectionModel().getSelectedIndex());
     saveItemList();
@@ -235,6 +235,7 @@ public class ZoneCreatorController {
           zonePane.add(imageView, gridX, gridY);
           onScreenDisplayItemsMap.put(key, imageView);
           imageViewToItemsMap.put(imageView, selectedItem);
+          onScreenDisplayItemsReverseMap.put(imageView, key);
         }
       } else if (monstersTab.isSelected()) {
         Monster selectedItem = monsterListView.getSelectionModel().getSelectedItem();
@@ -253,7 +254,7 @@ public class ZoneCreatorController {
     onScreenDisplayItemsMap.remove(key);
     
     zonePane.getChildren().remove(imageView);
-    System.out.println("Delete Item");
+    System.out.println("Delete Item x");
   }
 
   private void handleEditItem(ImageView imageView) {

@@ -23,6 +23,7 @@ public class GameObjectWithStatusEffects extends GameObject {
   
   public GameObjectWithStatusEffects(int x, int y) {
     super(x, y);
+    setStatusEffects(new ArrayList<>());
   }
   
   public void tick() {
