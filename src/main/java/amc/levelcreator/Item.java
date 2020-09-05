@@ -26,9 +26,9 @@ public class Item extends Label implements Serializable, Cloneable {
   }
   
   public Item(GameObject gameObject) {
+    this.setGameObject(gameObject);
     this.setName(gameObject.getName());
     this.setImageResource(gameObject.getIdleImageResource());
-    this.setGameObject(gameObject);
   }
 
   public Object clone() {

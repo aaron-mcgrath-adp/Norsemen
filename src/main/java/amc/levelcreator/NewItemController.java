@@ -6,6 +6,7 @@ import amc.GameObject;
 import amc.actions.StatusEffectCollisionAction;
 import amc.statuseffects.StatusEffect;
 import amc.statuseffects.StatusEffectController;
+import amc.util.FileHelper;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -16,7 +17,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 public class NewItemController {
@@ -54,8 +54,6 @@ public class NewItemController {
   @FXML
   private Button bClose, bSave;
   
-  private Stage stage;
-  
   private Item newItem;
   
   @FXML
@@ -74,7 +72,7 @@ public class NewItemController {
     });
     
     bChooseDialogue.setOnMouseClicked( event -> {
-      File dialogueFile = this.chooseFile("Dialogue Files", "*.dialog");
+      File dialogueFile = FileHelper.chooseFile((Stage) bChooseDialogue.getScene().getWindow(), "Dialogue Files", "*.dialog");
       if(dialogueFile != null) 
         dialogueText.setText(dialogueFile.getName());
       else
@@ -115,7 +113,7 @@ public class NewItemController {
     
     idleImage.setOnMouseClicked( event -> {
       try {
-        File imageFile = this.chooseFile("PNG Files", "*.png");
+        File imageFile = FileHelper.chooseFile((Stage) idleImage.getScene().getWindow(), "PNG Files", "*.png");
         if(imageFile != null) {
           idleImage.setImage(new Image(getClass().getClassLoader().getResourceAsStream(imageFile.getName())));
           newItem.setImageResource(imageFile.getName());
@@ -149,13 +147,5 @@ public class NewItemController {
   public void closeWindow() {
     Stage stage = (Stage) bClose.getScene().getWindow();
     stage.close();
-  }
-  
-  private File chooseFile(String filterName, String filter) {
-    FileChooser fileChooser = new FileChooser();
-    fileChooser.setInitialDirectory(new File("./config"));
-    fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(filterName, filter));
-    
-    return fileChooser.showOpenDialog(stage);
   }
 }

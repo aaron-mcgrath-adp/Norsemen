@@ -27,6 +27,22 @@ public class PropertyFileHandler {
     }
   }
   
+  public static Object loadBinaryFile(String propertiesFileName) {
+    try {
+      FileInputStream fileOutputStream = new FileInputStream(propertiesFileName);
+      ObjectInputStream objectInputStream = new ObjectInputStream(fileOutputStream);
+      
+      Object returnObject = objectInputStream.readObject();
+      
+      objectInputStream.close();
+      
+      return returnObject;
+    } catch (Exception ex) {
+      ex.printStackTrace();
+      return null;
+    }
+  }
+  
   public static void savePropertyFile(String propertiesFileName, List<?> data) {
     try {
       File file = new File(propertiesFileName);
@@ -35,7 +51,7 @@ public class PropertyFileHandler {
         file.createNewFile();
       }
 
-      FileOutputStream fileOutputStream = new FileOutputStream(propertiesFileName);
+      FileOutputStream fileOutputStream = new FileOutputStream(file);
       ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
       objectOutputStream.writeObject(data);
       objectOutputStream.flush();
@@ -53,7 +69,7 @@ public class PropertyFileHandler {
         file.createNewFile();
       }
 
-      FileOutputStream fileOutputStream = new FileOutputStream(propertiesFileName);
+      FileOutputStream fileOutputStream = new FileOutputStream(file);
       ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
       objectOutputStream.writeObject(object);
       objectOutputStream.flush();

@@ -2,7 +2,6 @@ package amc;
 
 public class Camera {
 
-  private static final int MAP_SPACER = GamePreferences.getInstance().getIntPreference(GamePreferencesEnum.MAP_SPACER_DO_NOT_CHANGE);
   private static final int WINDOW_WIDTH = GamePreferences.getInstance().getIntPreference(GamePreferencesEnum.WINDOW_WIDTH);
   private static final int WINDOW_HEIGHT = GamePreferences.getInstance().getIntPreference(GamePreferencesEnum.WINDOW_HEIGHT);
   
@@ -25,14 +24,15 @@ public class Camera {
       if(y <= 0) y = 0;
       if(y >= WINDOW_HEIGHT + 32) y = WINDOW_HEIGHT + 32;
     } else {
+      // can fix the camera moving too far left and down here.
       if(x <= 0) 
         x = 0;
-      if(x >= (getCurrentLevel().getWidth() * MAP_SPACER)) 
-        x = (getCurrentLevel().getWidth() * MAP_SPACER);
+      if(x >= (getCurrentLevel().getWidth())) 
+        x = (getCurrentLevel().getWidth());
       if(y <= 0) 
         y = 0;
-      if(y >= (getCurrentLevel().getHeight() * MAP_SPACER)) 
-        x = (getCurrentLevel().getHeight() * MAP_SPACER);
+      if(y >= (getCurrentLevel().getHeight())) 
+        x = (getCurrentLevel().getHeight());
     }
   }
 

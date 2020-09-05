@@ -12,6 +12,11 @@
     -fx-background-insets: 0,1,2,0;
 }
 
+.genericPink {
+	-fx-background-color: radial-gradient(center 50% 0%, radius 100%, #ff00db, #6f0060);
+	-fx-background-radius: 10;
+}
+
 .label{
     -fx-background-radius: 5,4,3,5;
     -fx-background-insets: 0,1,2,0;

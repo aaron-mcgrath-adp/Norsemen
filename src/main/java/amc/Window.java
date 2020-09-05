@@ -9,7 +9,7 @@ public class Window {
   
   private Canvas canvas;
   
-  public Window(int height, int width, String title) {
+  public Window(int height, int width, String title, boolean exitOnClose) {
     
     this.setCanvas(new Canvas());
     
@@ -20,8 +20,16 @@ public class Window {
     
     window.add(getCanvas());
     
+    window.addWindowListener(new java.awt.event.WindowAdapter() {
+      @Override
+      public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+        GameState.getInstance().setRunning(false);
+      }
+    });
+    
     window.setResizable(false);
-    window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    if(exitOnClose)
+      window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     window.setLocationRelativeTo(null);
     window.setVisible(true);
   }

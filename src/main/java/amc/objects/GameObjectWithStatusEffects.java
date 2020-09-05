@@ -13,6 +13,7 @@ public class GameObjectWithStatusEffects extends GameObject {
 
   private static final long serialVersionUID = 4768744296216593904L;
 
+  // effects currently infecting me.
   private List<StatusEffect> statusEffects;
   
   private int hitPoints;
@@ -20,6 +21,8 @@ public class GameObjectWithStatusEffects extends GameObject {
   private int health;
   
   private int speedModifier;
+  
+  private int speed;
   
   public GameObjectWithStatusEffects(int x, int y) {
     super(x, y);
@@ -111,6 +114,14 @@ public class GameObjectWithStatusEffects extends GameObject {
 
   public void setSpeedModifier(int speedModifier) {
     this.speedModifier = speedModifier;
+  }
+
+  public int getSpeed() {
+    return speed;
+  }
+
+  public void setSpeed(int speed) {
+    this.speed = speed;
   }
   
 }

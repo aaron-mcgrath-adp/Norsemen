@@ -6,6 +6,8 @@ import java.util.List;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 
+import amc.objects.Player;
+
 public class Level implements Serializable {
 
   private static final long serialVersionUID = 6645756318491192970L;
@@ -26,7 +28,14 @@ public class Level implements Serializable {
   }
   
   public void loadLevel(ObjectHandler objectHandler) {
-    
+    getGameObjects().forEach( gameObject -> {
+      if(gameObject instanceof Player) {
+        ((Player) gameObject).setObjectHandler(objectHandler);
+        objectHandler.setPlayer(gameObject);
+      }
+      else
+        objectHandler.addGameObject(gameObject);
+    });
   }
 
   public void startAmbientBackground() {

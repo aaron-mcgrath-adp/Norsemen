@@ -1,27 +1,17 @@
 package amc.objects;
 
 import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-import amc.BufferedImageLoader;
 import amc.GameObject;
-import amc.GamePreferences;
-import amc.GamePreferencesEnum;
 import amc.ObjectHandler;
 
 public class Player extends GameObjectWithStatusEffects {
   
-  private ObjectHandler objectHandler;
+  private static final long serialVersionUID = 7578342772510568520L;
 
-  private static final int HEIGHT = GamePreferences.getInstance().getIntPreference(GamePreferencesEnum.PLAYER_HEIGHT_SIZE_PIXELS);
-  private static final int WIDTH = GamePreferences.getInstance().getIntPreference(GamePreferencesEnum.PLAYER_WIDTH_SIZE_PIXELS);
-  private static final int SPEED = GamePreferences.getInstance().getIntPreference(GamePreferencesEnum.PLAYER_MOVEMENT_SPEED);
-  private static final int HIT_POINTS = GamePreferences.getInstance().getIntPreference(GamePreferencesEnum.PLAYER_HIT_POINTS);
-  private static final String PLAYER_SPRITE = GamePreferences.getInstance().getStringPreference(GamePreferencesEnum.PLAYER_SPRITE);
-  
-  private BufferedImage playerSprite = BufferedImageLoader.loadImage(PLAYER_SPRITE);
+  private transient ObjectHandler objectHandler;
   
   private int ammo;
   
@@ -29,16 +19,17 @@ public class Player extends GameObjectWithStatusEffects {
   
   private List<GameObject> currentCollisions;
   
+  public Player() {
+    this(0, 0, null);
+  }
+  
   public Player(int x, int y, ObjectHandler objectHandler) {
     super(x, y);
     this.setObjectHandler(objectHandler);
-    this.setHealth(HIT_POINTS);
-    this.setHitPoints(HIT_POINTS);
     this.setAmmo(100);
     
     this.setInventory(new ArrayList<>());
     this.setCurrentCollisions(new ArrayList<>());
-    this.addInventoryItem(new Sword(0, 0));
   }
 
   @Override
@@ -60,16 +51,16 @@ public class Player extends GameObjectWithStatusEffects {
       setVelocityX(0);
     
     if(getObjectHandler().isDown()) 
-      setVelocityY(SPEED);
+      setVelocityY(getSpeed());
     
     if(getObjectHandler().isUp()) 
-      setVelocityY(SPEED * -1);
+      setVelocityY(getSpeed() * -1);
     
     if(getObjectHandler().isLeft()) 
-      setVelocityX(SPEED * -1);
+      setVelocityX(getSpeed() * -1);
     
     if(getObjectHandler().isRight()) 
-      setVelocityX(SPEED);
+      setVelocityX(getSpeed());
   }
   
   public void collision() {
@@ -88,7 +79,7 @@ public class Player extends GameObjectWithStatusEffects {
 
   @Override
   public Rectangle getBounds() {
-    return new Rectangle(this.getX(), this.getY(), WIDTH, HEIGHT);
+    return new Rectangle(this.getX(), this.getY(), getIdleImage().getWidth(), getIdleImage().getHeight());
   }
 
   public ObjectHandler getObjectHandler() {
@@ -126,11 +117,6 @@ public class Player extends GameObjectWithStatusEffects {
 
   public void setInventory(List<GameObject> inventory) {
     this.inventory = inventory;
-  }
-
-  @Override
-  public BufferedImage getIdleImage() {
-    return playerSprite;
   }
 
   public List<GameObject> getCurrentCollisions() {

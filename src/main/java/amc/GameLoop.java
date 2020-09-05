@@ -31,6 +31,8 @@ public class GameLoop implements Runnable {
   private Image hudSprite = BufferedImageLoader.loadImage(HUD_SPRITE);
   private Image hudEmptySlotSprite = BufferedImageLoader.loadImage(HUD_EMPTY_SLOT_SPRITE);
   private Image hudFilledSlotSprite = BufferedImageLoader.loadImage(HUD_FILLED_SLOT_SPRITE);
+  
+  private BufferedImage levelBackgroundImage;
 
   public GameLoop(Canvas canvas) {
     this.setCanvas(canvas);
@@ -45,6 +47,9 @@ public class GameLoop implements Runnable {
     
     // TODO: Need to set the level.
     gameState.getCurrentLevel().loadLevel(getObjectHandler());
+    
+    if(!GameState.getInstance().getCurrentLevel().getBackgroundImageResource().isEmpty())
+      levelBackgroundImage = BufferedImageLoader.loadImage(GameState.getInstance().getCurrentLevel().getBackgroundImageResource());
     
     this.setCamera(new Camera(0, 0));
     this.getCamera().setCurrentLevel(gameState.getCurrentLevel());
@@ -107,8 +112,29 @@ public class GameLoop implements Runnable {
     
     graphics2d.translate(-camera.getX(), -camera.getY());
     
-    // Probably needs a repeat thing.
-    graphics.drawImage(BufferedImageLoader.loadImage(GameState.getInstance().getCurrentLevel().getBackgroundImageResource()), 0, 0, null);
+    // Handle drawing the background image, even if we need to repeat it.
+    if(levelBackgroundImage != null) {
+      if(GameState.getInstance().getCurrentLevel().isRepeatBackgroundImage()) {
+        int backWidth = levelBackgroundImage.getWidth();
+        int backHeight = levelBackgroundImage.getHeight();
+        
+        int zoneWidth = GameState.getInstance().getCurrentLevel().getWidth();
+        int zoneHeight = GameState.getInstance().getCurrentLevel().getHeight();
+        
+        int widthCopies = (zoneWidth / backWidth) + 1;
+        int heightCopies = (zoneHeight / backHeight) + 1;
+        
+        for(int x = 0; x < widthCopies; x ++) {
+          for(int y = 0; y < heightCopies; y ++) {
+            int imageX = backWidth * x;
+            int imageY = backHeight * y;
+            graphics.drawImage(levelBackgroundImage, imageX, imageY, null);
+          }
+        }
+      } else {
+        graphics.drawImage(levelBackgroundImage, 0, 0, null);
+      }
+    }
     
     this.getObjectHandler().render(graphics);
     

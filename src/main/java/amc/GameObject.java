@@ -20,7 +20,7 @@ public abstract class GameObject implements Serializable, Cloneable {
   
   private float velocityX, velocityY;
   
-  private BufferedImage idleImage;
+  private transient BufferedImage idleImage;
   
   private String idleImageResource;
   
