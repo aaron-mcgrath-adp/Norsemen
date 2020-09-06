@@ -83,26 +83,22 @@ public class Player extends GameObjectWithStatusEffects {
     
     if(getObjectHandler().isDown()) {
       setVelocityY(getSpeed());
-      if(!getAnimationRunner().getAnimation().equals(getDownAnimation()))
-        getAnimationRunner().loadNewAnimation(getDownAnimation());
+      getAnimationRunner().loadNewAnimation(getDownAnimation());
     }
     
     if(getObjectHandler().isUp()) {
       setVelocityY(getSpeed() * -1);
-      if(!getAnimationRunner().getAnimation().equals(getUpAnimation()))
-        getAnimationRunner().loadNewAnimation(getUpAnimation());
+      getAnimationRunner().loadNewAnimation(getUpAnimation());
     }
     
     if(getObjectHandler().isLeft()) {
       setVelocityX(getSpeed() * -1);
-      if(!getAnimationRunner().getAnimation().equals(getLeftAnimation()))
-        getAnimationRunner().loadNewAnimation(getLeftAnimation());
+      getAnimationRunner().loadNewAnimation(getLeftAnimation());
     }
     
     if(getObjectHandler().isRight()) {
       setVelocityX(getSpeed());
-      if(!getAnimationRunner().getAnimation().equals(getRightAnimation()))
-        getAnimationRunner().loadNewAnimation(getRightAnimation());
+      getAnimationRunner().loadNewAnimation(getRightAnimation());
     }
   }
   

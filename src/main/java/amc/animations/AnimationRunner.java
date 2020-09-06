@@ -40,10 +40,13 @@ public class AnimationRunner {
   }
 
   public void loadNewAnimation(Animation animation) {
-    setAnimation(animation);
-    setCurrentDisplayedIndex(-1);
-    lastImageChangeTime = 0;
-    delayBetweenImageFlip = getAnimation().getSpeedMs() / getAnimation().getImageResources().size();
+    // only reset the animation if it is a new one.
+    if(!animation.equals(getAnimation())) {
+      setAnimation(animation);
+      setCurrentDisplayedIndex(-1);
+      lastImageChangeTime = 0;
+      delayBetweenImageFlip = getAnimation().getSpeedMs() / getAnimation().getImageResources().size();
+    }
   }
   
   public Animation getAnimation() {

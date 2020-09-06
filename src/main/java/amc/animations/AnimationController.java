@@ -22,7 +22,7 @@ public class AnimationController {
   
   private static final String ANIMATIONS_DIR = "./config/animations/";
   
-  private static final int ANIMATION_THREAD_SLEEP = 50;
+  private static final int ANIMATION_THREAD_SLEEP = 10;
   
   @FXML
   private Button bSave, bAdd, bDelete, bClose;
