@@ -90,6 +90,14 @@
                         <TextField fx:id="playerName" layoutX="69.0" layoutY="120.0" prefHeight="23.0" prefWidth="188.0" AnchorPane.rightAnchor="8.0" AnchorPane.topAnchor="120.0" />
                         <TextField fx:id="playerHitpoints" layoutX="133.0" layoutY="151.0" prefHeight="23.0" prefWidth="121.0" AnchorPane.rightAnchor="11.0" AnchorPane.topAnchor="151.0" />
                         <TextField fx:id="playerSpeed" layoutX="133.0" layoutY="181.0" prefHeight="23.0" prefWidth="121.0" AnchorPane.rightAnchor="11.0" AnchorPane.topAnchor="181.0" />
+                        <Label layoutX="14.0" layoutY="224.0" prefHeight="16.0" prefWidth="117.0" text="Left Animation:" />
+                        <Button fx:id="bLeftAnimation" layoutX="133.0" layoutY="214.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="118.0" text="Set" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="214.0" />
+                        <Label layoutX="14.0" layoutY="266.0" prefHeight="16.0" prefWidth="117.0" text="Right Animation:" />
+                        <Button fx:id="bRightAnimation" layoutX="133.0" layoutY="256.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="118.0" text="Set" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="255.0" />
+                        <Label layoutX="14.0" layoutY="308.0" prefHeight="16.0" prefWidth="117.0" text="Up Animation:" />
+                        <Button fx:id="bUpAnimation" layoutX="133.0" layoutY="298.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="118.0" text="Set" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="297.0" />
+                        <Label layoutX="14.0" layoutY="350.0" prefHeight="16.0" prefWidth="117.0" text="Down Animation:" />
+                        <Button fx:id="bDownAnimation" layoutX="133.0" layoutY="340.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="118.0" text="Set" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="340.0" />
                      </children>
                   </AnchorPane>
               </content>

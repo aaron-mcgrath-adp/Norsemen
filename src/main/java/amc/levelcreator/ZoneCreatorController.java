@@ -1,6 +1,7 @@
 package amc.levelcreator;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,6 +13,8 @@ import amc.GameObject;
 import amc.GamePreferences;
 import amc.GamePreferencesEnum;
 import amc.Level;
+import amc.animations.Animation;
+import amc.animations.AnimationListController;
 import amc.objects.Player;
 import amc.util.FileHelper;
 import amc.util.PropertyFileHandler;
@@ -101,6 +104,9 @@ public class ZoneCreatorController {
   @FXML
   private Button bLiveTest;
   
+  @FXML
+  private Button bLeftAnimation, bRightAnimation, bUpAnimation, bDownAnimation;
+  
   private Player editingPlayer;
   
   private Map<String, ImageView> onScreenDisplayItemsMap;
@@ -126,6 +132,26 @@ public class ZoneCreatorController {
     redrawGrid(Integer.parseInt(zoneX.getText()), Integer.parseInt(zoneY.getText()));
     
     loadLists();
+    
+    bLeftAnimation.setOnMouseClicked(event -> {
+      editingPlayer.setLeftAnimation(addPlayerAnimation());
+      updatePlayerAnimationButtons();
+    });
+    
+    bRightAnimation.setOnMouseClicked(event -> {
+      editingPlayer.setRightAnimation(addPlayerAnimation());
+      updatePlayerAnimationButtons();
+    });
+    
+    bUpAnimation.setOnMouseClicked(event -> {
+      editingPlayer.setUpAnimation(addPlayerAnimation());
+      updatePlayerAnimationButtons();
+    });
+    
+    bDownAnimation.setOnMouseClicked(event -> {
+      editingPlayer.setDownAnimation(addPlayerAnimation());
+      updatePlayerAnimationButtons();
+    });
     
     bLiveTest.setOnMouseClicked( event -> {
       doSaveZone();
@@ -210,6 +236,38 @@ public class ZoneCreatorController {
     loadLevel();
     loadBackground();
     loadPlayer();
+    updatePlayerAnimationButtons();
+  }
+
+  private void updatePlayerAnimationButtons() {
+    if(editingPlayer.getLeftAnimation() != null) 
+      bLeftAnimation.setText(editingPlayer.getLeftAnimation().getName());
+    if(editingPlayer.getRightAnimation() != null) 
+      bRightAnimation.setText(editingPlayer.getRightAnimation().getName());
+    if(editingPlayer.getUpAnimation() != null) 
+      bUpAnimation.setText(editingPlayer.getUpAnimation().getName());
+    if(editingPlayer.getDownAnimation() != null) 
+      bDownAnimation.setText(editingPlayer.getDownAnimation().getName());
+  }
+
+  private Animation addPlayerAnimation() {
+    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("AnimationList.fxml"));
+    AnimationListController animationController = new AnimationListController();    
+    fxmlLoader.setController(animationController);
+    Parent root = null;
+    try {
+      root = (Parent) fxmlLoader.load();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    Scene scene = new Scene(root);
+    scene.getStylesheets().add("/zone-creator.css");
+    Stage stage = new Stage();
+    stage.setTitle("Animation List");
+    stage.setScene(scene);
+    stage.showAndWait();
+    
+    return animationController.getSelectedAnimation();
   }
 
   private void loadPlayer() {

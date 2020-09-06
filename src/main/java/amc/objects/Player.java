@@ -1,11 +1,14 @@
 package amc.objects;
 
+import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
 import amc.GameObject;
 import amc.ObjectHandler;
+import amc.animations.Animation;
+import amc.animations.AnimationRunner;
 
 public class Player extends GameObjectWithStatusEffects {
   
@@ -19,6 +22,19 @@ public class Player extends GameObjectWithStatusEffects {
   
   private List<GameObject> currentCollisions;
   
+  private Animation leftAnimation;
+  
+  private Animation rightAnimation;
+  
+  private Animation upAnimation;
+  
+  private Animation downAnimation;
+  
+  private Animation idleAnimation;
+  
+  private transient AnimationRunner animationRunner;
+  
+  
   public Player() {
     this(0, 0, null);
   }
@@ -30,8 +46,20 @@ public class Player extends GameObjectWithStatusEffects {
     
     this.setInventory(new ArrayList<>());
     this.setCurrentCollisions(new ArrayList<>());
+    this.setAnimationRunner(new AnimationRunner());
+    
+    this.setIdleAnimation(new Animation("DefaultIdle", 10000, getIdleImageResource()));
+    this.setLeftAnimation(new Animation("DefaultLeft", 10000, getIdleImageResource()));
+    this.setRightAnimation(new Animation("DefaultRight", 10000, getIdleImageResource()));
+    this.setUpAnimation(new Animation("DefaultUp", 10000, getIdleImageResource()));
+    this.setDownAnimation(new Animation("DefaultDown", 10000, getIdleImageResource()));
   }
 
+  @Override
+  public void render(Graphics graphics) {
+    graphics.drawImage(getAnimationRunner().doAnimationTick(), getX(), getY(), null);
+  }
+  
   @Override
   public void tick() {
     this.setX(this.getX() + (int) (this.getVelocityX() + getSpeedModifier()));
@@ -50,17 +78,32 @@ public class Player extends GameObjectWithStatusEffects {
     if((!getObjectHandler().isRight()) && (!getObjectHandler().isLeft()))
       setVelocityX(0);
     
-    if(getObjectHandler().isDown()) 
+    if((!getObjectHandler().isDown()) && (!getObjectHandler().isUp()) && (!getObjectHandler().isLeft()) && (!getObjectHandler().isRight()))
+      getAnimationRunner().loadNewAnimation(getIdleAnimation());
+    
+    if(getObjectHandler().isDown()) {
       setVelocityY(getSpeed());
+      if(!getAnimationRunner().getAnimation().equals(getDownAnimation()))
+        getAnimationRunner().loadNewAnimation(getDownAnimation());
+    }
     
-    if(getObjectHandler().isUp()) 
+    if(getObjectHandler().isUp()) {
       setVelocityY(getSpeed() * -1);
+      if(!getAnimationRunner().getAnimation().equals(getUpAnimation()))
+        getAnimationRunner().loadNewAnimation(getUpAnimation());
+    }
     
-    if(getObjectHandler().isLeft()) 
+    if(getObjectHandler().isLeft()) {
       setVelocityX(getSpeed() * -1);
+      if(!getAnimationRunner().getAnimation().equals(getLeftAnimation()))
+        getAnimationRunner().loadNewAnimation(getLeftAnimation());
+    }
     
-    if(getObjectHandler().isRight()) 
+    if(getObjectHandler().isRight()) {
       setVelocityX(getSpeed());
+      if(!getAnimationRunner().getAnimation().equals(getRightAnimation()))
+        getAnimationRunner().loadNewAnimation(getRightAnimation());
+    }
   }
   
   public void collision() {
@@ -112,6 +155,8 @@ public class Player extends GameObjectWithStatusEffects {
   }
 
   public List<GameObject> getInventory() {
+    if(inventory == null)
+      inventory = new ArrayList<>();
     return inventory;
   }
 
@@ -120,10 +165,74 @@ public class Player extends GameObjectWithStatusEffects {
   }
 
   public List<GameObject> getCurrentCollisions() {
+    if(currentCollisions == null)
+      currentCollisions = new ArrayList<>();
     return currentCollisions;
   }
 
   public void setCurrentCollisions(List<GameObject> currentCollisions) {
     this.currentCollisions = currentCollisions;
+  }
+
+  public Animation getLeftAnimation() {
+    if(leftAnimation == null)
+      leftAnimation = new Animation("DefaultLeft", 10000, getIdleImageResource());
+    return leftAnimation;
+  }
+
+  public Animation getRightAnimation() {
+    if(rightAnimation == null)
+      rightAnimation = new Animation("DefaultRight", 10000, getIdleImageResource());
+    return rightAnimation;
+  }
+
+  public Animation getUpAnimation() {
+    if(upAnimation == null)
+      upAnimation = new Animation("DefaultUp", 10000, getIdleImageResource());
+    return upAnimation;
+  }
+
+  public Animation getDownAnimation() {
+    if(downAnimation == null)
+      downAnimation = new Animation("DefaulDown", 10000, getIdleImageResource());
+    return downAnimation;
+  }
+
+  public void setLeftAnimation(Animation leftAnimation) {
+    this.leftAnimation = leftAnimation;
+  }
+
+  public void setRightAnimation(Animation rightAnimation) {
+    this.rightAnimation = rightAnimation;
+  }
+
+  public void setUpAnimation(Animation upAnimation) {
+    this.upAnimation = upAnimation;
+  }
+
+  public void setDownAnimation(Animation downAnimation) {
+    this.downAnimation = downAnimation;
+  }
+
+  public AnimationRunner getAnimationRunner() {
+    if(animationRunner == null) {
+      animationRunner = new AnimationRunner();
+      animationRunner.loadNewAnimation(getIdleAnimation());
+    }
+    return animationRunner;
+  }
+
+  public void setAnimationRunner(AnimationRunner animationRunner) {
+    this.animationRunner = animationRunner;
+  }
+
+  public Animation getIdleAnimation() {
+    if(idleAnimation == null)
+      idleAnimation  = new Animation("DefaulIdle", 10000, getIdleImageResource());
+    return idleAnimation;
+  }
+
+  public void setIdleAnimation(Animation idleAnimation) {
+    this.idleAnimation = idleAnimation;
   }
 }

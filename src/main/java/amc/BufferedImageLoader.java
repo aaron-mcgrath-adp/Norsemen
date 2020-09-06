@@ -10,13 +10,30 @@ import java.awt.image.ImageFilter;
 import java.awt.image.ImageProducer;
 import java.awt.image.RGBImageFilter;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 
+import javafx.embed.swing.SwingFXUtils;
+
 public class BufferedImageLoader {
+  
+  private static Map<String, BufferedImage> staticCache = new HashMap<>();
 
   public BufferedImageLoader() {
 
+  }
+  
+  public static BufferedImage loadCachedImage(String resource) {
+    BufferedImage bufferedImage = staticCache.get(resource);
+    if(bufferedImage != null)
+      return bufferedImage;
+    else {
+      BufferedImage loadImage = loadImage(resource);
+      staticCache.put(resource, loadImage);
+      return loadImage;
+    }
   }
 
   public static BufferedImage loadImage(String resource) {
@@ -72,5 +89,13 @@ public class BufferedImageLoader {
 
     // Return the buffered image
     return bimage;
+  }
+  
+  public static javafx.scene.image.Image toFxImage(BufferedImage bufferedimage) {
+    return SwingFXUtils.toFXImage(bufferedimage, null );
+  }
+  
+  public static void clearCache() {
+    staticCache = new HashMap<>();
   }
 }
