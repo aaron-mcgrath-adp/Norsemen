@@ -12,6 +12,7 @@ import amc.ObjectHandler;
 
 public class Bullet extends GameObject {
 
+  private static final long serialVersionUID = -7665747062860123100L;
   private static final int HEIGHT = GamePreferences.getInstance().getIntPreference(GamePreferencesEnum.BULLET_HEIGHT_PIXELS);
   private static final int WIDTH = GamePreferences.getInstance().getIntPreference(GamePreferencesEnum.BULLET_WIDTH_PIXELS);
   private static final int SPEED = GamePreferences.getInstance().getIntPreference(GamePreferencesEnum.BULLET_MOVEMENT_SPEED);

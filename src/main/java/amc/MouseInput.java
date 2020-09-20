@@ -20,12 +20,14 @@ public class MouseInput extends MouseAdapter {
     int mx = (int) (event.getX() + getCamera().getX());
     int my = (int) (event.getY() + getCamera().getY());
     
-    GameObject player = getObjectHandler().getPlayer();
+    Player player = (Player) getObjectHandler().getPlayer();
+    player.activateItem();
     
-    if(((Player) player).getAmmo() > 0) {
-      getObjectHandler().addGameObject(new Bullet(player.getX(), (int) (player.getY() + (player.getBounds().getHeight() / 2)), getObjectHandler(), mx, my));
-      ((Player) player).setAmmo(((Player) player).getAmmo() - 1);
-    }
+    // fire animation code here.
+//    if(((Player) player).getAmmo() > 0) {
+//      getObjectHandler().addGameObject(new Bullet(player.getX(), (int) (player.getY() + (player.getBounds().getHeight() / 2)), getObjectHandler(), mx, my));
+//      ((Player) player).setAmmo(((Player) player).getAmmo() - 1);
+//    }
     
   }
   

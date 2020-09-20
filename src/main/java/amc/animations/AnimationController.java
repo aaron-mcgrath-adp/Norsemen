@@ -12,6 +12,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
@@ -28,13 +29,16 @@ public class AnimationController {
   private Button bSave, bAdd, bDelete, bClose;
   
   @FXML
-  private TextField speed, name;
+  private TextField speed, name, iterations;
   
   @FXML
   private Label play, pause;
   
   @FXML
   private ImageView imageView;
+  
+  @FXML
+  private CheckBox cbNoInterruption;
   
   @FXML
   private ListView<AnimationImage> imageListView;
@@ -93,6 +97,8 @@ public class AnimationController {
     if(getEditingAnimation() != null) {
       name.setText(getEditingAnimation().getName());
       speed.setText(Integer.toString(getEditingAnimation().getSpeedMs()));
+      cbNoInterruption.setSelected(getEditingAnimation().isCannotBeInterrupted());
+      iterations.setText(Integer.toString(getEditingAnimation().getLoopCount()));
       
       imageListData.clear();
       getEditingAnimation().getImageResources().forEach( imageResource -> {
@@ -122,6 +128,8 @@ public class AnimationController {
     
     getEditingAnimation().setName(name.getText());
     getEditingAnimation().setSpeedMs(Integer.parseInt(speed.getText()));
+    getEditingAnimation().setCannotBeInterrupted(cbNoInterruption.isSelected());
+    getEditingAnimation().setLoopCount(Integer.parseInt(iterations.getText()));
     
     getEditingAnimation().getImageResources().clear();
     imageListData.forEach( animationImage -> {
@@ -150,6 +158,9 @@ public class AnimationController {
           
           imageListView.getSelectionModel().select(runner.getCurrentDisplayedIndex());
         });
+        
+        if(runner.isComplete())
+          animationPlaying = false;
         
         try {
           Thread.sleep(ANIMATION_THREAD_SLEEP);

@@ -64,6 +64,7 @@ public class GameLoop implements Runnable {
     long timer = System.currentTimeMillis();
     int frames = 0;
     
+    // tick will happen 60 fps, but render will run as fast as it can.
     while(gameState.isRunning()) {
       getCanvas().requestFocus();
       
@@ -75,6 +76,7 @@ public class GameLoop implements Runnable {
         tick();
         delta --;
       }
+      
       render();
       frames ++;
       

@@ -12,6 +12,10 @@ public class Animation implements Serializable {
   
   private int speedMs;
   
+  private boolean cannotBeInterrupted;
+  
+  private int loopCount;
+  
   private List<String> imageResources;
   
   public Animation() {
@@ -58,5 +62,21 @@ public class Animation implements Serializable {
   
   public String toString() {
     return getName();
+  }
+
+  public boolean isCannotBeInterrupted() {
+    return cannotBeInterrupted;
+  }
+
+  public void setCannotBeInterrupted(boolean cannotBeInterrupted) {
+    this.cannotBeInterrupted = cannotBeInterrupted;
+  }
+
+  public int getLoopCount() {
+    return loopCount;
+  }
+
+  public void setLoopCount(int loopCount) {
+    this.loopCount = loopCount;
   }
 }

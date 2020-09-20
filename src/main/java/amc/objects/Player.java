@@ -2,12 +2,14 @@ package amc.objects;
 
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
 import amc.GameObject;
 import amc.ObjectHandler;
 import amc.animations.Animation;
+import amc.animations.AnimationLoader;
 import amc.animations.AnimationRunner;
 
 public class Player extends GameObjectWithStatusEffects {
@@ -34,6 +36,7 @@ public class Player extends GameObjectWithStatusEffects {
   
   private transient AnimationRunner animationRunner;
   
+  private LootableGameObject activeItem;
   
   public Player() {
     this(0, 0, null);
@@ -54,10 +57,23 @@ public class Player extends GameObjectWithStatusEffects {
     this.setUpAnimation(new Animation("DefaultUp", 10000, getIdleImageResource()));
     this.setDownAnimation(new Animation("DefaultDown", 10000, getIdleImageResource()));
   }
+  
+  public void activateItem() {
+    if(getActiveItem() == null) {
+      this.setActiveItem(new LootableGameObject(0, 0));
+      this.getActiveItem().setActivatedAnimation(AnimationLoader.loadAnimation("SwordSwing"));
+    }
+    getAnimationRunner().loadNewAnimation(getActiveItem().getActivatedAnimation());
+  }
 
   @Override
   public void render(Graphics graphics) {
-    graphics.drawImage(getAnimationRunner().doAnimationTick(), getX(), getY(), null);
+    BufferedImage animationTick = getAnimationRunner().doAnimationTick();
+    if(animationTick == null) {
+      getAnimationRunner().loadNewAnimation(getIdleAnimation());
+      animationTick = getAnimationRunner().doAnimationTick();
+    }
+    graphics.drawImage(animationTick, getX(), getY(), null);
   }
   
   @Override
@@ -80,6 +96,34 @@ public class Player extends GameObjectWithStatusEffects {
     
     if((!getObjectHandler().isDown()) && (!getObjectHandler().isUp()) && (!getObjectHandler().isLeft()) && (!getObjectHandler().isRight()))
       getAnimationRunner().loadNewAnimation(getIdleAnimation());
+    
+    if((getObjectHandler().isDown()) && (getObjectHandler().isLeft())) {
+      setVelocityY(getSpeed());
+      setVelocityX(getSpeed() * -1);
+      getAnimationRunner().loadNewAnimation(getLeftAnimation());
+      return;
+    }
+    
+    if((getObjectHandler().isDown()) && (getObjectHandler().isRight())) {
+      setVelocityY(getSpeed());
+      setVelocityX(getSpeed());
+      getAnimationRunner().loadNewAnimation(getRightAnimation());
+      return;
+    }
+    
+    if((getObjectHandler().isUp()) && (getObjectHandler().isLeft())) {
+      setVelocityY(getSpeed() * -1);
+      setVelocityX(getSpeed() * -1);
+      getAnimationRunner().loadNewAnimation(getLeftAnimation());
+      return;
+    }
+    
+    if((getObjectHandler().isUp()) && (getObjectHandler().isRight())) {
+      setVelocityY(getSpeed() * -1);
+      setVelocityX(getSpeed());
+      getAnimationRunner().loadNewAnimation(getRightAnimation());
+      return;
+    }
     
     if(getObjectHandler().isDown()) {
       setVelocityY(getSpeed());
@@ -230,5 +274,13 @@ public class Player extends GameObjectWithStatusEffects {
 
   public void setIdleAnimation(Animation idleAnimation) {
     this.idleAnimation = idleAnimation;
+  }
+
+  public LootableGameObject getActiveItem() {
+    return activeItem;
+  }
+
+  public void setActiveItem(LootableGameObject activeItem) {
+    this.activeItem = activeItem;
   }
 }
